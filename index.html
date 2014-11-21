@@ -16,6 +16,7 @@
   </head>
   <body>
     <h3>Write a story:</h3>
+    <p id="countdown">Countdown: </p>
     <p id="messages"></p>
     <p id="newWord"></p>
     <form action="">
@@ -41,30 +42,66 @@
         console.log('newWord contains: '+$('#newWord').text());
         // $('#newWord').empty();
         $('#newWord').empty();
-        $('#newWord').append( document.createTextNode('['));    
-        for (var key in msg){
-          $('#newWord').append( document.createTextNode(key+':'+msg[key]+','));
-        }
-        $('#newWord').append( document.createTextNode(']'));
+
+        makeString(msg);
+
       });
 
-      socket.on('initialize', function(msg) {
+      socket.on('initialize', function(msg, pastWords) {
         console.log('init');
-        
-        $('#newWord').append( document.createTextNode('['));    
-        for (var key in msg){
-          $('#newWord').append( document.createTextNode(key+':'+msg[key]+','));
+
+        $('#newWord').empty(); 
+        makeString(msg);
+
+        for(var i=0; i<pastWords.length; i++) {
+          $('#messages').append( document.createTextNode(pastWords[i]+' '));    
         }
+      });
+
+      function makeString(msg) {
+        var innerString = "";
+          $('#newWord').append( document.createTextNode('['));    
+
+        for (var key in msg){
+          innerString += (key+':'+msg[key]+',');  
+        }
+        innerString = innerString.substring(0,innerString.length-1);
+        $('#newWord').append( document.createTextNode(innerString));
         $('#newWord').append( document.createTextNode(']'));
 
-        // for(var i=0; i<pastWords.length; i++) {
-        //   if(i===pastWords.length-1){
-        //   $('#newWord').append( document.createTextNode(pastWords[i]+' '));    
-        //   } else {
-        //   $('#messages').append( document.createTextNode(pastWords[i]+' '));
-        // }
-        // }
+      }
+
+
+      socket.on('server update', function(word){
+
+        $('#messages').append( document.createTextNode(word + " "));
+        $('#newWord').empty();
+        // $('#newWord').append( document.createTextNode('['));    
+        // $('#newWord').append( document.createTextNode(']'));
+
       });
+
+
+
+
+      socket.on('update time', function(counter){
+          $('#countdown').empty();
+          $('#countdown').append( document.createTextNode("Countdown: " + counter));
+      });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
   </body>
 </html>
