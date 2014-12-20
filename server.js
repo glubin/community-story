@@ -1,12 +1,20 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var redis = require("redis"),
+  client = redis.createClient();
+
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
 
 var pastWords = [];
 var potentials = {};
 var mySockets = {};
 var votes = {};
 var counter = 10;
+var storyKeyCounter = 0;
+var endStoryVote = {};
 
 app.get('/', function(req, res){
   res.sendfile(__dirname + '/index.html');
@@ -18,7 +26,7 @@ io.on('connection', function(socket){
   console.log(new Date().getTime());
 
   socket.emit('initialize', votes, pastWords);
-  
+   
   // socket.on('get chat history', function(msg) {
   //  // io.emit('initialize', pastWords);  
   //  console.log('passes');
@@ -53,10 +61,21 @@ io.on('connection', function(socket){
     io.emit('chat message', votes);
     // pastWords.push(msg);
       // io.emit('chat message', msg);
-    });
+  });
+
+  socket.on('new story vote', function(vote){
+      endStoryVote[socket.id] = vote;
+  });
 });
 
 function updateWord(){
+    var voteCounter = 0;
+    for (var vote in endStoryVote){
+      if(endStoryVote[vote]){
+        voteCounter++;
+      }
+    }
+
     var empty = true;
     for (var key in votes){
       if (votes.hasOwnProperty(key)){
@@ -64,7 +83,7 @@ function updateWord(){
          break;
       }
     }
-    if (empty){
+    if (empty && voteCounter===0){
         return;
     }
 
@@ -77,11 +96,20 @@ function updateWord(){
       }
     }
 
-    io.emit('server update', wordToAdd);
-    pastWords.push(wordToAdd);
+    if(voteToAdd > voteCounter){
+      io.emit('server update', wordToAdd);
+      pastWords.push(wordToAdd);
+    } else {
+      client.set(storyKeyCounter, pastWords, redis.print);
+      client.get(storyKeyCounter, function(err, reply){
+        console.log("from redis "+ reply.toString());
+      });
+      pastWords = [];
+      io.emit('story complete');
+    }
+
     votes = {};
     potentials = {};
-
 }
 
 

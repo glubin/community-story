@@ -19,6 +19,9 @@
     <p id="countdown">Countdown: </p>
     <p id="messages"></p>
     <p id="newWord"></p>
+
+    <input id="newStory" type="checkbox">New Story</input>
+
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
@@ -30,8 +33,14 @@
 
       console.log('runs');
 
+
+      $('#newStory').change(function(){      
+        socket.emit('new story vote', this.checked);
+      });
+
       $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
+        var input = $('#m').val().split(" ");
+        socket.emit('chat message', input[0]);
         $('#m').val('');
         return false;
       });
@@ -82,12 +91,23 @@
       });
 
 
-
-
       socket.on('update time', function(counter){
           $('#countdown').empty();
           $('#countdown').append( document.createTextNode("Countdown: " + counter));
       });
+
+
+      socket.on('story complete', function(){
+        $('#messages').empty();
+        $('#newWord').empty();
+      });
+
+
+
+
+
+
+
 
 
 
