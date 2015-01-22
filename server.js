@@ -1,6 +1,8 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
 var redis = require("redis"),
   client = redis.createClient();
 
@@ -16,9 +18,7 @@ var counter = 10;
 var storyKeyCounter = 0;
 var endStoryVote = {};
 
-app.get('/', function(req, res){
-  res.sendfile(__dirname + '/index.html');
-});
+app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket){
   // console.log(socket);
