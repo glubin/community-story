@@ -14,7 +14,10 @@ var pastWords = [];
 var potentials = {};
 var mySockets = {};
 var votes = {};
-var counter = 10;
+
+var syncTime = 3;
+var counter = syncTime;
+
 var storyKeyCounter = 0;
 var endStoryVote = {};
 
@@ -96,16 +99,19 @@ function updateWord(){
       }
     }
 
-    if(voteToAdd > voteCounter){
+    if(voteToAdd >= voteCounter){
       io.emit('server update', wordToAdd);
       pastWords.push(wordToAdd);
-    } else {
-      client.set(storyKeyCounter, pastWords, redis.print);
-      client.get(storyKeyCounter, function(err, reply){
-        console.log("from redis "+ reply.toString());
-      });
-      pastWords = [];
-      io.emit('story complete');
+    }
+    else {
+      // client.set(storyKeyCounter, pastWords, redis.print);
+      // client.get(storyKeyCounter, function(err, reply){
+      //   console.log("from redis "+ reply.toString());
+      // });
+      if (pastWords.length !== 0) {
+        io.emit('story complete');
+        pastWords = [];
+      }
     }
 
     votes = {};
@@ -119,7 +125,7 @@ function updateWord(){
     io.emit('update time', counter);
     if (counter === 0){
       updateWord();
-      counter = 10;
+      counter = syncTime;
     }
 
   }
@@ -127,7 +133,7 @@ function updateWord(){
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
-  setInterval(updateTime,1000);
+  setInterval(updateTime,(1000));
 });
 
 

@@ -15,19 +15,26 @@
     <title>Community Story</title>
     <h3>Write a story:</h3>
     <p id="countdown">Countdown: </p>
-    <p id="pastStories"></p>
     <p id="messages"></p>
     <p id="newWord"></p>
 
     <input id="newStory" type="checkbox">New Story</input>
-
+    
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
+
+    <div id="pastStories"></div>
+  
+
+
+
+
+
+
+
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-
-
 
     <script>
       var socket = io();
@@ -87,6 +94,7 @@
 
         $('#messages').append( document.createTextNode(word + " "));
         $('#newWord').empty();
+        $('#newStory').prop('checked', false);
         // $('#newWord').append( document.createTextNode('['));    
         // $('#newWord').append( document.createTextNode(']'));
 
@@ -100,11 +108,27 @@
 
 
       socket.on('story complete', function(){
+        var oldHTML = $('#pastStories').html();
+        var newStory = $('#messages').text();
+        
+        $('#newStory').prop('checked', false);
+
+        var newHTML = appendNewStory(oldHTML, newStory)
+        $('#pastStories').html(newHTML);
+
         $('#messages').empty();
         $('#newWord').empty();
       });
 
+      function appendNewStory(oldHTML, newStory) {
+        var html = oldHTML;
 
+        html = '<p>' +
+                  newStory +
+                '</p>' +
+                html;
+        return html;
+      }
 
 
 
