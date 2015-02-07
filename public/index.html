@@ -1,61 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
+  <link rel="stylesheet" type"text/css" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type"text/css"  href="css/style.css" >
+  <script src="js/script.js" ></script>
+  <script src="js/bootstrap.min.js"></script>
+</head>
 
-    <link rel="stylesheet" type"text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type"text/css"  href="css/style.css" >
-    <script src="js/script.js" ></script>
-    <script src="js/bootstrap.min.js"></script>
 
 
-  </head>
 
-  
-  <body>
-    <title>Community Story</title>
-    <h3>Write a story:</h3>
-    <p id="countdown">Countdown: </p>
-    <p id="messages"></p>
-    <p id="newWord"></p>
+<body>
+  <title>Community Story</title>
+  <div class="container">
+    <div class="row">
+      <h2 class="text-center col-md-4 col-md-offset-4">Build A Story</h2>
+      <p> <button type="button" class="btn btn-success col-md-2 col-md-offset-5" id="countdown">Warning</button></p>
+    </div>
+  </div>
 
-    <input id="newStory" type="checkbox">New Story</input>
-    
+  <br><br><br> <!-- For Now -->
+
+  <div class="col-md-6 col-md-offset-3">
+    <p class="text-left lead" id="messages"></p>
+    <br><br>
+    <p class="text-center lead" id="newWord"></p>
+    <br>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+      <input id="m" placeholder="Enter the next word here and press enter." autocomplete="off" />
     </form>
-
-    <div id="pastStories"></div>
-  
-
-
-
-
+    <!--  add back "<button>Send</button>" before closing form     -->
+    <input id="newStory" type="checkbox">New Story</input>
+    <br><br><br>
+    <div class="lead" id="pastStories"></div>
+  </div>
 
 
 
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
-    <script>
-      var socket = io();
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+  <script>
+  var socket = io();
     //  socket.emit('get chat history', '');
 
-      console.log('runs');
+    console.log('runs');
 
 
-      $('#newStory').change(function(){      
-        socket.emit('new story vote', this.checked);
-      });
+    $('#newStory').change(function(){      
+      socket.emit('new story vote', this.checked);
+    });
 
-      $('form').submit(function(){
-        var input = $('#m').val().split(" ");
-        socket.emit('chat message', input[0]);
-        $('#m').val('');
-        return false;
-      });
+    $('form').submit(function(){
+      var input = $('#m').val().split(" ");
+      socket.emit('chat message', input[0]);
+      $('#m').val('');
+      return false;
+    });
 
-      socket.on('chat message', function(msg){
-        
+    socket.on('chat message', function(msg){
+
         // $('#messages').append( document.createTextNode($('#newWord').text()));
         console.log('newWord contains: '+$('#newWord').text());
         // $('#newWord').empty();
@@ -65,89 +70,73 @@
 
       });
 
-      socket.on('initialize', function(msg, pastWords) {
-        console.log('init');
+    socket.on('initialize', function(msg, pastWords) {
+      console.log('init');
 
-        $('#newWord').empty(); 
-        makeString(msg);
+      $('#newWord').empty(); 
+      makeString(msg);
 
-        for(var i=0; i<pastWords.length; i++) {
-          $('#messages').append( document.createTextNode(pastWords[i]+' '));    
-        }
-      });
-
-      function makeString(msg) {
-        var innerString = "";
-          $('#newWord').append( document.createTextNode('['));    
-
-        for (var key in msg){
-          innerString += (key+':'+msg[key]+',');  
-        }
-        innerString = innerString.substring(0,innerString.length-1);
-        $('#newWord').append( document.createTextNode(innerString));
-        $('#newWord').append( document.createTextNode(']'));
-
+      for(var i=0; i<pastWords.length; i++) {
+        $('#messages').append( document.createTextNode(pastWords[i]+' '));    
       }
+    });
+
+    function makeString(msg) {
+      var innerString = "";
+      $('#newWord').append( document.createTextNode('['));    
+
+      for (var key in msg){
+        innerString += (key+':'+msg[key]+',');  
+      }
+      innerString = innerString.substring(0,innerString.length-1);
+      $('#newWord').append( document.createTextNode(innerString));
+      $('#newWord').append( document.createTextNode(']'));
+
+    }
 
 
-      socket.on('server update', function(word){
+    socket.on('server update', function(word){
 
-        $('#messages').append( document.createTextNode(word + " "));
-        $('#newWord').empty();
-        $('#newStory').prop('checked', false);
+      $('#messages').append( document.createTextNode(word + " "));
+      $('#newWord').empty();
+      $('#newStory').prop('checked', false);
         // $('#newWord').append( document.createTextNode('['));    
         // $('#newWord').append( document.createTextNode(']'));
 
       });
 
 
-      socket.on('update time', function(counter){
-          $('#countdown').empty();
-          $('#countdown').append( document.createTextNode("Countdown: " + counter));
-      });
+    socket.on('update time', function(counter){
+      $('#countdown').empty();
+      $('#countdown').append( document.createTextNode("Countdown: " + counter));
+    });
 
 
-      socket.on('story complete', function(){
-        var oldHTML = $('#pastStories').html();
-        var newStory = $('#messages').text();
-        
-        $('#newStory').prop('checked', false);
+    socket.on('story complete', function(){
+      var oldHTML = $('#pastStories').html();
+      var newStory = $('#messages').text();
+      $('#newStory').prop('checked', false);
 
-        var newHTML = appendNewStory(oldHTML, newStory)
-        $('#pastStories').html(newHTML);
+      var newHTML = appendNewStory(oldHTML, newStory)
+      $('#pastStories').html(newHTML);
 
-        $('#messages').empty();
-        $('#newWord').empty();
-      });
+      $('#messages').empty();
+      $('#newWord').empty();
+    });
 
-      function appendNewStory(oldHTML, newStory) {
-        var html = oldHTML;
+    function appendNewStory(oldHTML, newStory) {
+      var html = oldHTML;
 
-        html = '<p>' +
-                  newStory +
-                '</p>' +
-                html;
-        return html;
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      html = '<p>' +
+      newStory +
+      '</p>' +
+      html;
+      return html;
+    }
 
 
 
 
     </script>
   </body>
-</html>
+  </html>

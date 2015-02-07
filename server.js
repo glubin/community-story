@@ -15,7 +15,7 @@ var potentials = {};
 var mySockets = {};
 var votes = {};
 
-var syncTime = 3;
+var syncTime = 5;
 var counter = syncTime;
 
 var storyKeyCounter = 0;
