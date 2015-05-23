@@ -1,16 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-
     <link rel="stylesheet" type"text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type"text/css"  href="css/style.css" >
     <script src="js/script.js" ></script>
     <script src="js/bootstrap.min.js"></script>
-
-
   </head>
-
-  
   <body>
     <title>Community Story</title>
     <h3>Write a story:</h3>
@@ -27,103 +22,6 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
-
-
-    <script>
-      var socket = io();
-    //  socket.emit('get chat history', '');
-
-      console.log('runs');
-
-
-      $('#newStory').change(function(){      
-        socket.emit('new story vote', this.checked);
-      });
-
-      $('form').submit(function(){
-        var input = $('#m').val().split(" ");
-        socket.emit('chat message', input[0]);
-        $('#m').val('');
-        return false;
-      });
-
-      socket.on('chat message', function(msg){
-        
-        // $('#messages').append( document.createTextNode($('#newWord').text()));
-        console.log('newWord contains: '+$('#newWord').text());
-        // $('#newWord').empty();
-        $('#newWord').empty();
-
-        makeString(msg);
-
-      });
-
-      socket.on('initialize', function(msg, pastWords) {
-        console.log('init');
-
-        $('#newWord').empty(); 
-        makeString(msg);
-
-        for(var i=0; i<pastWords.length; i++) {
-          $('#messages').append( document.createTextNode(pastWords[i]+' '));    
-        }
-      });
-
-      function makeString(msg) {
-        var innerString = "";
-          $('#newWord').append( document.createTextNode('['));    
-
-        for (var key in msg){
-          innerString += (key+':'+msg[key]+',');  
-        }
-        innerString = innerString.substring(0,innerString.length-1);
-        $('#newWord').append( document.createTextNode(innerString));
-        $('#newWord').append( document.createTextNode(']'));
-
-      }
-
-
-      socket.on('server update', function(word){
-
-        $('#messages').append( document.createTextNode(word + " "));
-        $('#newWord').empty();
-        // $('#newWord').append( document.createTextNode('['));    
-        // $('#newWord').append( document.createTextNode(']'));
-
-      });
-
-
-      socket.on('update time', function(counter){
-          $('#countdown').empty();
-          $('#countdown').append( document.createTextNode("Countdown: " + counter));
-      });
-
-
-      socket.on('story complete', function(){
-        $('#messages').empty();
-        $('#newWord').empty();
-      });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    </script>
+    <script type="text/javascript" src="./js/story.js"></script>
   </body>
 </html>
