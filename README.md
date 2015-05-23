@@ -1,7 +1,3 @@
-# chat-example
+Crowdsourcing a short story. The user will propose the next word in the story. After a given amount of time, the most voted upon word will be locked in as the next word in the story. Almost ready for launch. Needed: change suggested words based on rank, store suggestions in database
 
-This is the source code for a very simple chat example used for 
-the [Getting Started](http://socket.io/get-started/chat/) guide 
-of the Socket.IO website.
-
-Please refer to it to learn how to run this application.
+By: Greg and Ze'ev

@@ -1,27 +1,54 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Imports and Stylesheets !-->
     <link rel="stylesheet" type"text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type"text/css"  href="css/style.css" >
-    <script src="js/script.js" ></script>
     <script src="js/bootstrap.min.js"></script>
-  </head>
-  <body>
-    <title>Community Story</title>
-    <h3>Write a story:</h3>
-    <p id="countdown">Countdown: </p>
-    <p id="pastStories"></p>
-    <p id="messages"></p>
-    <p id="newWord"></p>
-
-    <input id="newStory" type="checkbox">New Story</input>
-
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  </head>
 
+  <body>
+    <title>Community Story</title>
+
+    <div class="container">
+      <div class="row">
+        <h2 class="text-center col-md-4 col-md-offset-4">Build A Story</h2>
+        <p> <button type="button" class="btn btn-success col-md-2 col-md-offset-5" id="countdown">Loading...</button></p>
+      </div>
+    </div>
+
+    <br><br><br> <!-- For Now -->
+
+    <div class="col-md-6 col-md-offset-3">
+      <p class="text-left lead" id="messages"></p>
+      
+      <br><br><br>
+
+      <form action="">
+        <input id="m" placeholder="Enter the next word here and press enter." autocomplete="off" />
+      </form>
+      <!--  add back "<button>Send</button>" before closing form     -->
+      <!-- <input id="newStory" type="checkbox">Start New Story</input> -->
+      <br>
+      <button id="newStory" type="button" class="btn btn-info col-md-2 col-md-offset-5" >New Story</button>
+      <br><br><br>
+      <p class="text-center lead" id="newWord"></p>
+      <br>
+      <div class="lead" id="pastStories"></div>
+    </div>
+
+    <!-- Meat of the program, controls all logic !-->
     <script type="text/javascript" src="./js/story.js"></script>
+
+    <footer id="siteFooter">
+      <div class="container">
+        <br>
+        <p class="text-center">
+          <a href="http://www.lailari.me"  target="_blank">Ze'ev Lailari</a> and <a href="http://www.greglubin.com" target="_blank">Greg Lubin</a></p>
+      </div>
+    </footer>
+
   </body>
 </html>

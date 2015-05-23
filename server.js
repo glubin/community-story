@@ -22,11 +22,12 @@ var potentials = {};
 var mySockets = {};
 // maps word to the number of votes it has
 var votes = {};
-// time between votes
-var counter = 10;
-// old db thing
-// var storyKeyCounter = 0;
-// dictionary mapping socket to a vote to end the story
+
+
+var syncTime = 6;
+var counter = syncTime;
+
+// dictionary mapping socket -> a vote to end the story
 var endStoryVote = {};
 
 app.use(express.static(__dirname + '/public'));
@@ -45,22 +46,22 @@ io.on('connection', function(socket){
 
     // quits function if user submits same word
     if(potentials[socket.id] === msg) {
-        return;
+      return;
     }
 
     if(potentials[socket.id] in votes){
-        votes[potentials[socket.id]]--;
+      votes[potentials[socket.id]]--;
     }
     
     if(votes[potentials[socket.id]] === 0) {
-        delete votes[potentials[socket.id]];
+      delete votes[potentials[socket.id]];
     }
 
     // counts vote or adds new word
     if (msg in votes){
-        votes[msg]++;
+      votes[msg]++;
     } else {
-        votes[msg] = 1;
+      votes[msg] = 1;
     }
 
     // registers what you voted for
@@ -69,10 +70,10 @@ io.on('connection', function(socket){
     io.emit('update proposed words', votes);
     // pastWords.push(msg);
       // io.emit('chat message', msg);
-  });
+    });
 
   socket.on('new story vote', function(vote){
-      endStoryVote[socket.id] = vote;
+    endStoryVote[socket.id] = vote;
   });
 });
 
@@ -93,14 +94,14 @@ function updateWord(){
     // check if there are any votes
     for (var key in votes){
       if (votes.hasOwnProperty(key)){
-         empty = false;
-         break;
-      }
-    }
+       empty = false;
+       break;
+     }
+   }
 
     // no one voted, do nothing
     if (empty && endCounter===0){
-        return;
+      return;
     }
 
     // find most popular word
@@ -114,7 +115,7 @@ function updateWord(){
     }
 
     // decide whether to end story or add new word
-    if(voteToAdd > endCounter){
+    if(voteToAdd >= endCounter){
       // send update to all clients
       io.emit('server update', wordToAdd);
       // store new word in past words list
@@ -122,35 +123,32 @@ function updateWord(){
     } else {
       // put word in to DB
       // // *** need to change this to SQL ***
-      // client.set(storyKeyCounter, pastWords, redis.print);
-      // client.get(storyKeyCounter, function(err, reply){
-      //   console.log("from redis "+ reply.toString());
-      // });
-    
-      // maintain recent stories queue
-      if (recentStories.length >= numRecentStories) {
-        recentStories.shift();
-      }
-      recentStories.push(pastWords.join(' '));
+      if (pastWords.length !== 0) {
 
-      // reset past words and send update to clients
-      pastWords = [];
-      io.emit('story complete');
+        // maintain recent stories queue
+        if (recentStories.length >= numRecentStories) {
+          recentStories.shift();
+        }
+        recentStories.push(pastWords.join(' '));
+
+        // reset past words and send update to clients
+        io.emit('story complete');
+        pastWords = [];
+      }
     }
 
-    // clear dicts
-    votes = {};
-    potentials = {};
+  // clear dicts
+  votes = {};
+  potentials = {};
 }
 
-// Send time until update to each client
-//  Run update word at the end of 10 seconds
+
 function updateTime(){
   counter --;
   io.emit('update time', counter);
   if (counter === 0){
     updateWord();
-    counter = 10;
+    counter = syncTime;
   }
 }
 

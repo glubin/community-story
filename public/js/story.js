@@ -52,11 +52,26 @@ socket.on('update time', function(counter){
 
 
 socket.on('story complete', function(){
-  $('#pastStories').append( document.createTextNode('\n'));
-  $('#pastStories').append( document.createTextNode($('#messages').text()));
+  var oldHTML = $('#pastStories').html();
+  var newStory = $('#messages').text();
+  $('#newStory').prop('checked', false);
+
+  var newHTML = appendNewStory(oldHTML, newStory)
+  $('#pastStories').html(newHTML);
+
   $('#messages').empty();
   $('#newWord').empty();
 });
+
+function appendNewStory(oldHTML, newStory) {
+  var html = oldHTML;
+
+  html = '<p>' +
+  newStory +
+  '</p>' +
+  html;
+  return html;
+}
 
 // put your string in to the potential list
 function makeString(msg) {
