@@ -1,8 +1,23 @@
 var socket = io();
 
-$('#newStory').change(function(){      
-  socket.emit('new story vote', this.checked);
+var newStoryVote = false;
+
+$('#newStory').click(function(){
+  newStoryVote = !newStoryVote;
+  if (newStoryVote) {
+    $('newStory').css('color','red');
+  }
+  console.log('hey');
+  socket.emit('new story vote', newStoryVote);
 });
+
+$("#getStories").click(function(e){
+    socket.emit('get past stories')
+});
+
+socket.on('return stories from DB', function(stories) {
+  console.log('Old Stories: ' + JSON.stringify(stories, null, 4));
+})
 
 $('form').submit(function(){
   var input = $('#m').val().split(" ");

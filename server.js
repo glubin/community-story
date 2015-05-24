@@ -2,13 +2,23 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var mysql = require('mysql');
 
-// var redis = require("redis"),
-//   client = redis.createClient();
+// mysql stuff
+var connection = mysql.createConnection({
+  host     : process.env.MYSQL_HOSTNAME,
+  user     : process.env.MYSQL_USERNAME,
+  password : process.env.MYSQL_PASSWORD,
+  database : 'storiesDB'
+});
 
-// client.on("error", function (err) {
-//     console.log("Error " + err);
-// });
+connection.connect( function(err) {
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+  console.log('connected to mysql server, id: ' + connection.threadId);
+});
 
 // keep the past [numRecentStories] stories in 
 // memory for quick loading when new clients join
@@ -75,6 +85,15 @@ io.on('connection', function(socket){
   socket.on('new story vote', function(vote){
     endStoryVote[socket.id] = vote;
   });
+
+  socket.on('get past stories', function() {
+    connection.query('SELECT * FROM stories', function (err,res,fields) {
+      if (err) {
+        console.log('Query error: ' + err);
+      }
+      socket.emit('return stories from DB', res)
+    });
+  });
 });
 
 function updateWord(){
@@ -121,9 +140,8 @@ function updateWord(){
       // store new word in past words list
       pastWords.push(wordToAdd);
     } else {
-      // put word in to DB
-      // // *** need to change this to SQL ***
       if (pastWords.length !== 0) {
+        sendToDB(pastWords);
 
         // maintain recent stories queue
         if (recentStories.length >= numRecentStories) {
@@ -142,6 +160,14 @@ function updateWord(){
   potentials = {};
 }
 
+function sendToDB(pastWords) {
+  var newEntry = {story: pastWords.join(' ')}
+  connection.query('INSERT INTO stories SET ?', newEntry, function(err,res) {
+    if (err) {
+      console.log('Insert error: ' + err);
+    }
+  });
+}
 
 function updateTime(){
   counter --;

@@ -65,3 +65,8 @@ form button {
 	padding: 0; 
 	box-sizing: border-box;
 }
+
+.toggle_vote {
+    background-color: red;
+    color: red;
+}
