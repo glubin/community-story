@@ -66,6 +66,36 @@ form button {
 	box-sizing: border-box;
 }
 
+.parent {
+}
+
+.parent .popup {
+    display: none;
+}
+
+.parent:hover .popup {
+    background: rgb(242, 232, 232);
+    border-radius: 3px;
+    color: gray;
+    display: block;
+    height: 30px;
+    left: 0;
+    line-height: 30px;
+    position: absolute;
+}
+
+.parent:hover .popup:before {
+    display: block;
+    content: "";
+    position: absolute;
+    top: -5px;
+    width: 0; 
+    height: 0; 
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid rgb(242, 232, 232);
+}
+
 .toggle_vote {
     background-color: red;
     color: red;

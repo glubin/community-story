@@ -39,8 +39,15 @@ socket.on('initialize', function(msg, pastWords, recentStories) {
 
   if (recentStories.length > 0) {
     for (s in recentStories) {
-      $('#pastStories').append (document.createTextNode(recentStories[s]));
-      $('#pastStories').append (document.createTextNode('\n'));
+      // This needs to be changed to iterate over each word in each story
+      //  rather than just each story
+      $('#pastStories').append(
+        "<span class=\"parent\">" + 
+          recentStories[s] +
+          "<div class=\"popup\">" +
+          /* username, votes */ "PLACEHOLDER" +
+          "</div>" +
+        "</span>"); 
     }
   }
 
@@ -48,12 +55,25 @@ socket.on('initialize', function(msg, pastWords, recentStories) {
   makeString(msg);
 
   for(var i=0; i<pastWords.length; i++) {
-    $('#messages').append( document.createTextNode(pastWords[i]+' '));    
+    $('#messages').append(
+        "<span class=\"parent\">" + 
+          pastWords[i] + " " +
+          "<div class=\"popup\">" +
+          /* username, votes */ "PLACEHOLDER" +
+          "</div>" +
+        "</span>");    
   }
 });
 
 socket.on('server update', function(word){
-  $('#messages').append( document.createTextNode(word + " "));
+  word = escapeHtml(word)
+  $('#messages').append(
+        "<span class=\"parent\">" + 
+          word + " " +
+          "<div class=\"popup\">" +
+          /* username, votes */ "PLACEHOLDER" +
+          "</div>" +
+        "</span>");
   $('#newWord').empty();
         // $('#newWord').append( document.createTextNode('['));    
         // $('#newWord').append( document.createTextNode(']'));
@@ -99,5 +119,11 @@ function makeString(msg) {
   innerString = innerString.substring(0,innerString.length-1);
   $('#newWord').append( document.createTextNode(innerString));
   $('#newWord').append( document.createTextNode(']'));
-
 }
+
+// helper function to make sure that user input is safe
+function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+};

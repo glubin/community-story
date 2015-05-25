@@ -25,6 +25,11 @@ connection.connect( function(err) {
 var numRecentStories = 3
 var recentStories = []
 
+// array of objects containting (word, user that proposed word, votes) 
+//  for each accepted word
+var storyStorage = [];
+
+// the story currently being told
 var pastWords = [];
 // dictionary mapping socket to votes for a word
 var potentials = {};
